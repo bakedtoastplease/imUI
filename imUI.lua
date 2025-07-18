@@ -1,105 +1,69 @@
 local TweenService = game:GetService("TweenService")
-local UserInputService = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
+local UIS = game:GetService("UserInputService")
 
-local Library = {}
-Library.__index = Library
+local imUI = {}
+imUI.__index = imUI
 
-function Library:CreateWindow(settings)
-    settings = settings or {}
-    local title = settings.Name or "🌈 imUI Hub"
-    local rainbowSpeed = settings.RainbowSpeed or 5
+function imUI:CreateWindow(title)
+    local gui = Instance.new("ScreenGui", game:GetService("CoreGui"))
+    gui.Name = "imUI"
+    gui.ResetOnSpawn = false
 
-    -- ScreenGui
-    local screenGui = Instance.new("ScreenGui")
-    screenGui.Name = "aMainUI"
-    screenGui.ResetOnSpawn = false
-    screenGui.Parent = game:GetService("CoreGui")
+    local frame = Instance.new("Frame", gui)
+    frame.Size = UDim2.new(0, 400, 0, 500)
+    frame.Position = UDim2.new(0.5, -200, 0.5, -250)
+    frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    frame.Active = true
+    frame.Draggable = true
 
-    -- Main Frame
-    local mainFrame = Instance.new("Frame")
-    mainFrame.Size = UDim2.new(0, 400, 0, 500)
-    mainFrame.Position = UDim2.new(0.5, -200, 0.5, -250)
-    mainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-    mainFrame.BorderSizePixel = 0
-    mainFrame.Active = true
-    mainFrame.Draggable = true
-    mainFrame.Parent = screenGui
-
-    -- Rainbow Outline
-    local outline = Instance.new("UIStroke", mainFrame)
-    outline.Thickness = 3
-    outline.Color = Color3.fromHSV(0, 1, 1)
-
-    -- Title
-    local titleBar = Instance.new("TextLabel")
+    local titleBar = Instance.new("TextLabel", frame)
     titleBar.Size = UDim2.new(1, 0, 0, 40)
-    titleBar.BackgroundTransparency = 1
-    titleBar.Text = title
+    titleBar.Text = title or "🌈 imUI"
     titleBar.TextColor3 = Color3.new(1, 1, 1)
-    titleBar.TextSize = 24
+    titleBar.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
     titleBar.Font = Enum.Font.GothamBold
-    titleBar.Parent = mainFrame
+    titleBar.TextSize = 22
 
-    -- Tab Holder
-    local tabHolder = Instance.new("Frame")
-    tabHolder.Size = UDim2.new(1, 0, 1, -40)
-    tabHolder.Position = UDim2.new(0, 0, 0, 40)
-    tabHolder.BackgroundTransparency = 1
-    tabHolder.Parent = mainFrame
-
-    -- Animate rainbow
+    -- Радужная анимация
     spawn(function()
-        while true do
+        while task.wait() do
             for hue = 0, 1, 0.01 do
-                local color = Color3.fromHSV(hue, 1, 1)
-                outline.Color = color
-                titleBar.TextColor3 = color
-                wait(0.01 / rainbowSpeed)
+                titleBar.TextColor3 = Color3.fromHSV(hue, 1, 1)
+                task.wait(0.03)
             end
         end
     end)
 
+    local container = Instance.new("Frame", frame)
+    container.Size = UDim2.new(1, 0, 1, -40)
+    container.Position = UDim2.new(0, 0, 0, 40)
+    container.BackgroundTransparency = 1
+
     local Window = {}
 
-    function Window:CreateTab(tabName)
-        local tabFrame = Instance.new("Frame")
-        tabFrame.Size = UDim2.new(1, 0, 1, 0)
-        tabFrame.BackgroundTransparency = 1
-        tabFrame.Visible = true
-        tabFrame.Parent = tabHolder
+    function Window:CreateButton(text, callback)
+        local button = Instance.new("TextButton", container)
+        button.Size = UDim2.new(1, -20, 0, 40)
+        button.Position = UDim2.new(0, 10, 0, #container:GetChildren() * 45)
+        button.Text = text
+        button.Font = Enum.Font.Gotham
+        button.TextSize = 18
+        button.TextColor3 = Color3.new(1,1,1)
+        button.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+        button.MouseButton1Click:Connect(callback)
 
-        local Tab = {}
-
-        function Tab:CreateButton(buttonName, callback)
-            local button = Instance.new("TextButton")
-            button.Size = UDim2.new(1, -20, 0, 40)
-            button.Position = UDim2.new(0, 10, 0, #tabFrame:GetChildren() * 45)
-            button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-            button.TextColor3 = Color3.new(1, 1, 1)
-            button.TextSize = 18
-            button.Text = buttonName
-            button.Font = Enum.Font.Gotham
-            button.Parent = tabFrame
-
-            -- Button rainbow
-            spawn(function()
-                while true do
-                    for hue = 0, 1, 0.01 do
-                        local color = Color3.fromHSV(hue, 1, 1)
-                        button.TextColor3 = color
-                        wait(0.02 / rainbowSpeed)
-                    end
+        -- Радуга на кнопках
+        spawn(function()
+            while task.wait() do
+                for hue = 0, 1, 0.01 do
+                    button.TextColor3 = Color3.fromHSV(hue, 1, 1)
+                    task.wait(0.05)
                 end
-            end)
-
-            button.MouseButton1Click:Connect(callback)
-        end
-
-        return Tab
+            end
+        end)
     end
 
     return Window
 end
 
-return Library
+return imUI
